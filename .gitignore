@@ -42,5 +42,8 @@ pgdata/
 grafana_data/
 mosquitto_data/
 
+# SvelteKit
+.svelte-kit/
+
 # Hermes plans (generated, not source)
 .hermes/plans/
