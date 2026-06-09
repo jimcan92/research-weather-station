@@ -1,0 +1,19 @@
+# Grafana datasource provisioning
+# Auto-configures PostgreSQL connection on startup
+
+apiVersion: 1
+
+datasources:
+  - name: WeatherStation
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    database: weather_station
+    user: weather_ingestor
+    secureJsonData:
+      password: changeme
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+    editable: true

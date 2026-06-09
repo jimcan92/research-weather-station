@@ -1,0 +1,60 @@
+# ── Weather Station — Local Dev Services ────────────────────────────
+#
+# Quick start:
+#   docker compose up -d
+#
+# This starts PostgreSQL + Mosquitto MQTT + Grafana.
+# The server ingestor connects to these from the host.
+
+services:
+
+  # ── PostgreSQL 16 ─────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: ws-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: weather_station
+      POSTGRES_USER: weather_ingestor
+      POSTGRES_PASSWORD: changeme
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weather_ingestor -d weather_station"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Mosquitto MQTT Broker ─────────────────────────────────────────
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: ws-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+
+  # ── Grafana ───────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ws-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: ""
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+
+volumes:
+  pgdata:
+  mosquitto_data:
+  grafana_data:

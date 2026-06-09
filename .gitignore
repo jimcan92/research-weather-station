@@ -1,0 +1,46 @@
+# ── Git Ignore ─────────────────────────────────────────────────────
+
+# Dependencies
+node_modules/
+.pio/
+.pioenvs/
+
+# Build output
+dist/
+build/
+
+# Environment & secrets
+.env
+*.env
+!*.env.example
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# PlatformIO
+.pio/
+cmake-build-*/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Docker volumes (persisted by Docker, don't commit)
+pgdata/
+grafana_data/
+mosquitto_data/
+
+# Hermes plans (generated, not source)
+.hermes/plans/

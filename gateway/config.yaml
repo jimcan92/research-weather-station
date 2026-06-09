@@ -1,0 +1,40 @@
+# ── Weather Station — Raspberry Pi LoRa Gateway ────────────────────
+#
+# Single-channel LoRa packet forwarder.
+# Listens on SX1276/SX1278 module, forwards received packets to
+# the MQTT broker running on the Ryzen 5 server.
+#
+# Setup:
+#   1. Enable SPI: sudo raspi-config → Interface → SPI → Enable
+#   2. Install deps: pip3 install -r requirements.txt
+#   3. Edit config.yaml with your server IP
+#   4. Run: python3 lora_gateway.py
+
+mqtt:
+  broker: "localhost"        # IP of your Ryzen 5 server
+  port: 1883
+  topic: "weather/raw"
+  client_id: "rpi-gateway"
+  keepalive: 60
+
+lora:
+  frequency: 915.0           # MHz — Philippines ISM band
+  bandwidth: 125.0           # kHz
+  spreading_factor: 9        # Must match ESP32 nodes
+  coding_rate: 5             # 5→4/5, 6→4/6, 7→4/7, 8→4/8
+  sync_word: 0x12            # RADIOLIB_SX127X_SYNC_WORD
+  preamble_length: 8
+
+# If using SX1302 concentrator HAT instead of single-channel SX1276,
+# set mode: "concentrator" and configure the concentrator section.
+mode: "single"               # "single" or "concentrator"
+
+# Concentrator-specific (only used when mode: "concentrator")
+# concentrator:
+#   reset_pin: 22
+#   spi_speed: 8000000
+
+logging:
+  level: "INFO"              # DEBUG, INFO, WARNING, ERROR
+  file: ""                   # Empty = stdout only
+  show_packets: true         # Log received packet payloads

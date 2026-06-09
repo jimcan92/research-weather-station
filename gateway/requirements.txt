@@ -1,0 +1,8 @@
+# Raspberry Pi LoRa Gateway dependencies
+# Install: pip3 install -r requirements.txt
+
+paho-mqtt>=2.0,<3.0
+pyLoRa>=0.3
+RPi.GPIO>=0.7
+spidev>=3.5
+PyYAML>=6.0

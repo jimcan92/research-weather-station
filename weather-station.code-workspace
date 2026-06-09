@@ -1,0 +1,84 @@
+{
+  "folders": [
+    {
+      "name": "🏠 Weather Station (Root)",
+      "path": "."
+    },
+    {
+      "name": "🔧 Firmware — ESP32 Node",
+      "path": "firmware/weather-node"
+    },
+    {
+      "name": "📡 Gateway — RPi LoRa",
+      "path": "gateway"
+    },
+    {
+      "name": "🖥️ Server — Ingestor",
+      "path": "server"
+    },
+    {
+      "name": "🗄️ Database — Migrations",
+      "path": "database"
+    },
+    {
+      "name": "📊 Dashboard — SvelteKit",
+      "path": "dashboard"
+    },
+    {
+      "name": "📖 Docs",
+      "path": "docs"
+    }
+  ],
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.rulers": [100],
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "files.exclude": {
+      "**/.pio": true,
+      "**/.pioenvs": true
+    },
+    "search.exclude": {
+      "**/.pio": true,
+      "**/node_modules": true
+    },
+    "[cpp]": {
+      "editor.tabSize": 2,
+      "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "cSpell.words": [
+      "BME280",
+      "BMP280",
+      "DIO0",
+      "DS18B20",
+      "ESP32",
+      "LoRa",
+      "MQTT",
+      "NSS",
+      "SX1276",
+      "SX1278",
+      "SX1301",
+      "SX1302",
+      "WROOM",
+      "ingestor",
+      "mosquitto"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "platformio.platformio-ide",
+      "ms-vscode.cpptools",
+      "ms-python.python",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "streetsidesoftware.code-spell-checker",
+      "bierner.markdown-mermaid"
+    ]
+  }
+}

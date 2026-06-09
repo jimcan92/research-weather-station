@@ -1,0 +1,28 @@
+{
+  "editor.rulers": [100],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.exclude": {
+    "**/.pio": true,
+    "**/node_modules": true
+  },
+  "cSpell.words": [
+    "BME280",
+    "BMP280",
+    "DIO0",
+    "DS18B20",
+    "ESP32",
+    "LoRa",
+    "MQTT",
+    "NSS",
+    "SX1276",
+    "SX1278",
+    "SX1301",
+    "SX1302",
+    "WROOM",
+    "ingestor",
+    "mosquitto"
+  ],
+  "platformio-ide.autoRebuildAutocompleteIndex": true,
+  "platformio-ide.autoCloseSerialMonitor": false
+}
