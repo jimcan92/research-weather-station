@@ -1,0 +1,73 @@
+{
+  "bounds_resolved": 96,
+  "bounds_unresolved": [],
+  "overlap_count": 3,
+  "overlaps": [
+    {
+      "a": "U1",
+      "b": "#PWR33",
+      "bounds_a": {
+        "x_max": 110.49,
+        "x_min": 82.55,
+        "y_max": 29.21,
+        "y_min": 13.969999999999999
+      },
+      "bounds_b": {
+        "x_max": 99.06,
+        "x_min": 96.52000000000001,
+        "y_max": 29.21,
+        "y_min": 26.67
+      },
+      "detection": "symbol_geometry",
+      "overlap_x_mm": 2.539999999999992,
+      "overlap_y_mm": 2.539999999999999,
+      "type": "component_overlap",
+      "unit_a": 1,
+      "unit_b": 1
+    },
+    {
+      "a": "U1",
+      "b": "#PWR44",
+      "bounds_a": {
+        "x_max": 110.49,
+        "x_min": 82.55,
+        "y_max": 29.21,
+        "y_min": 13.969999999999999
+      },
+      "bounds_b": {
+        "x_max": 98.552,
+        "x_min": 97.028,
+        "y_max": 16.51,
+        "y_min": 13.970000000000002
+      },
+      "detection": "symbol_geometry",
+      "overlap_x_mm": 1.524000000000001,
+      "overlap_y_mm": 2.539999999999999,
+      "type": "component_overlap",
+      "unit_a": 1,
+      "unit_b": 1
+    },
+    {
+      "a": "U3",
+      "b": "#PWR40",
+      "bounds_a": {
+        "x_max": 74.92999999999999,
+        "x_min": 69.85,
+        "y_max": 143.637,
+        "y_min": 128.14299999999997
+      },
+      "bounds_b": {
+        "x_max": 70.612,
+        "x_min": 69.088,
+        "y_max": 144.78,
+        "y_min": 142.24
+      },
+      "detection": "symbol_geometry",
+      "overlap_x_mm": 0.7620000000000005,
+      "overlap_y_mm": 1.3969999999999914,
+      "type": "component_overlap",
+      "unit_a": 1,
+      "unit_b": 1
+    }
+  ]
+}

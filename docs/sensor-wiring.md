@@ -1,57 +1,66 @@
 # Sensor Wiring Reference
 
-## ESP32-WROOM-32 Pin Assignments
+> **Power-rail correction (2026-09-03):** GPIO assignments remain useful, but the final schematic uses Mini560 12V→5V plus AMS1117-3.3—not the dual-Mini560 architecture described in older sections below. Canonical source: `hardware/node-pcb/weather-node-complete.kicad_sch`.
+
+**Board:** ESP32-S3 N16R8 (HW678 v0.0.0)  
+**Project:** Weather Station Research  
+**Date:** June 14, 2026  
+**Revision:** v2.0 — Updated for 12V system, dual Mini560 power architecture  
+
+> See `docs/power-configuration.md` for complete power supply design.  
+> See `docs/pin-configuration-guide.md` for GPIO assignments.
+
+---
+
+## Power Rails Summary
 
 ```
-                   ┌──────────────┐
-                   │   ESP32-DEV  │
-                   │              │
-    LoRa NSS  ←─── │ GPIO5        │
-    LoRa SCK  ←─── │ GPIO18       │
-    LoRa MOSI ←─── │ GPIO23       │
-    LoRa MISO ───→ │ GPIO19       │
-    LoRa RST  ←─── │ GPIO14       │
-    LoRa DIO0 ───→ │ GPIO26       │
-                   │              │
-    I2C SDA   ←──→ │ GPIO21  ────→ BME280 SDA
-    I2C SCL   ←─── │ GPIO22  ────→ BME280 SCL
-                   │              │
-    OneWire   ←──→ │ GPIO4   ────→ DS18B20 DQ (4.7kΩ pull-up to 3.3V)
-                   │              │
-    Rain      ───→ │ GPIO34  ────→ Rain Gauge (NO, internal pull-up)
-    Wind Spd  ───→ │ GPIO35  ────→ Anemometer (NO, internal pull-up)
-    Wind Dir  ───→ │ GPIO36  ────→ Wind Vane signal (ADC)
-    Soil      ───→ │ GPIO39  ────→ Soil moisture AOUT (ADC)
-    Battery   ───→ │ GPIO33  ────→ Voltage divider center tap
-                   │              │
-    PWR Gate  ←─── │ GPIO32  ────→ MOSFET gate (sensor power switch)
-                   │              │
-                    ── 3.3V ──────→ Sensor VCC bus (via MOSFET)
-                    ── GND ───────→ Common ground
-                   └──────────────┘
+12V Battery/Solar
+    │
+    ├── Mini560 #1 (12V→5V) ──► 5V BUS ──► E22-900T22D
+    │
+    ├── Mini560 #2 (12V→3.3V) ──► 3.3V BUS ──► ESP32-S3, BME280, LTR390, DS18B20, Soil
+    │
+    └── MOSFET Switch (GPIO15) ──► 12V_SW ──► RS485 Anemometer + Wind Vane
 ```
+
+---
 
 ## Individual Sensor Wiring
 
 ### BME280 (Temperature, Humidity, Pressure)
 
 ```
-BME280    → ESP32
-VIN       → 3.3V (on MOSFET-switched bus)
+BME280    → ESP32-S3
+VIN       → 3.3V BUS
 GND       → GND
-SCL       → GPIO22 (I2C)
-SDA       → GPIO21 (I2C)
+SCL       → GPIO1 (I2C)
+SDA       → GPIO2 (I2C)
 ```
 
 - I2C address: 0x76 (SDO to GND) or 0x77 (SDO to VCC)
 - Library: Adafruit BME280
 
+### LTR390 (UV / Ambient Light)
+
+```
+LTR390    → ESP32-S3
+VIN       → 3.3V BUS
+GND       → GND
+SCL       → GPIO1 (I2C, shared with BME280)
+SDA       → GPIO2 (I2C, shared with BME280)
+INT       → (optional, not used)
+```
+
+- I2C address: 0x53
+- Library: Adafruit LTR390
+
 ### DS18B20 (Precision Temperature)
 
 ```
-DS18B20   → ESP32
-VDD (red) → 3.3V (switched bus)
-DQ  (yellow) → GPIO4
+DS18B20   → ESP32-S3
+VDD (red) → 3.3V BUS
+DQ  (yellow) → GPIO3 (OneWire)
 GND (black) → GND
 4.7kΩ resistor between DQ and VDD
 ```
@@ -62,93 +71,139 @@ GND (black) → GND
 ### Rain Gauge (Tipping Bucket)
 
 ```
-Rain Gauge → ESP32
+Rain Gauge → ESP32-S3
 Wire 1     → GND
-Wire 2     → GPIO34 (internal pull-up enabled)
+Wire 2     → GPIO10 (internal pull-up enabled)
 ```
 
 - Reed switch: normally open, closes on tip
-- Each tip = calibrated volume (typically 0.2-0.3 mm)
-- Calibrate by pouring measured water and counting tips
+- Each tip = calibrated volume (typically 0.2-0.3mm)
 
-### Anemometer (Wind Speed)
-
-```
-Anemometer → ESP32
-Wire 1     → GND
-Wire 2     → GPIO35 (internal pull-up enabled)
-```
-
-- Reed switch: one pulse per rotation
-- Convert: wind_speed (m/s) = pulse_frequency × calibration_factor
-- Typical factor: 2.4 m/s per Hz (calibrate per sensor)
-
-### Wind Vane (Direction)
+### Soil Moisture (Capacitive / Resistive)
 
 ```
-Wind Vane  → ESP32
-VCC        → 3.3V (switched bus)
-Signal     → GPIO36 (ADC1)
+Sensor     → ESP32-S3
+VCC        → 3.3V BUS (or GPIO13 for switched power)
 GND        → GND
+AOUT       → GPIO14 (ADC) — but GPIO14 used for battery ADC
 ```
 
-- Internal resistor network gives different voltage per direction
-- Read ADC, map to compass direction (0-360°)
-- Calibrate by measuring voltage at each cardinal point
+> **Note:** Soil moisture ADC conflicts with battery monitoring on GPIO14. Use GPIO13 to switch sensor VCC and read via a different ADC pin, or remap battery ADC to another pin.
 
-### Soil Moisture (Capacitive v1.2)
+---
+
+## RS485 Wind Sensors
+
+### DIYMORE isolated automatic-direction RS485 module
+
+The selected module has TTL pins **VCC, TXD, RXD, GND** (top to bottom in the supplied image), and **A+, B−, earth** screw terminals. U4 uses logical terminal numbers, not a verified PCB footprint.
+
+| Module terminal | Connection |
+|---|---|
+| VCC | 3.3V BUS from AMS1117-3.3 |
+| TXD | GPIO18 / UART1 RX — provisional: assumes module output |
+| RXD | GPIO17 / UART1 TX — provisional: assumes module input |
+| GND | ESP32/common GND (TTL side) |
+| A+ | Both wind sensors' A bus |
+| B− | Both wind sensors' B bus |
+| Earth | Reserved/unconnected in this design; separate from TTL GND |
+
+**Verify UART directions before wiring:** the product image labels TXD/RXD but does not specify input/output. The schematic provisionally uses crossed UART wiring. If the board labels refer to the host UART instead, connect GPIO17 TX to module TXD input and GPIO18 RX to module RXD output. Confirm with the seller's pin-direction diagram or datasheet; do not infer direction solely from the names.
+
+- Supply the TTL side at **3.3V**, consistent with the pictured 3.3V/5V marking. Confirm its output signal is 3.3V-compatible before connecting ESP32 RX.
+- Automatic direction control: **no DE/RE wire; GPIO16 is unused**. R8/R9 from the old 5V receive divider are removed. C7 remains 100nF across TTL VCC/GND.
+- R10 is **120Ω, DNP by default**. Fit only when this is a bus endpoint and the module does not already provide enabled termination; avoid duplicate parallel termination.
+- Do not bridge the pictured earth/protection terminal to TTL GND. Its grounding arrangement needs the module documentation. Sensor supply return remains the existing common GND; this design does not claim complete system galvanic isolation.
+- Wind sensors retain **12V_SW** power via GPIO15/MOSFET. Never feed their 12V into module VCC.
+
+### Anemometer + Wind Vane (field wiring)
 
 ```
-Sensor     → ESP32
-VCC        → GPIO32 (MOSFET-switched — power ONLY during reading!)
-GND        → GND
-AOUT       → GPIO39 (ADC1, 12-bit)
+12V_SW ──┬── Anemometer V+ (red/brown)
+         └── Wind Vane V+ (red/brown)
+
+GND ─────┬── Anemometer GND (black)
+         └── Wind Vane GND (black)
+
+RS485 A ─┬── Anemometer A (yellow or green)
+         └── Wind Vane A (yellow or green)
+
+RS485 B ─┬── Anemometer B (blue or white)
+         └── Wind Vane B (blue or white)
 ```
 
-- Capacitive sensors (v1.2) — do NOT use resistive probes
-- Power only during reading to prevent electrolysis corrosion
-- Typical range: ~1.2V (dry) to ~2.8V (wet)
+- Both sensors share the same RS485 bus
+- Each has a unique Modbus address — query individually
+- Powered via 12V_SW (GPIO15 controls MOSFET) — only ON during reading
 
-### Battery Voltage Divider
+---
 
-```
-Battery (+) ──[100kΩ]──┬──[220kΩ]── GND
-                        │
-                    GPIO33 (ADC)
-```
-
-- V_adc = V_battery × (R2 / (R1+R2)) = V_battery × (220/320) ≈ 0.6875 × V_battery
-- At 4.2V: ADC reads ~2.89V → safe for ESP32 (3.3V max)
-- Formula: V_battery = ADC_voltage × (R1+R2)/R2 = ADC_voltage × 320/220
-
-## Power System
+## Battery Voltage Divider (12V System)
 
 ```
-Solar Panel (5-10W, 18V)
-  │
-  ▼
+Battery (+) 12.6V max
+    │
+  [330kΩ]     ← R1 (top resistor)
+    │
+    ├──── GPIO14 (ADC2)   ← V_adc = V_bat × 100/(330+100)
+    │
+  [100kΩ]     ← R2 (bottom resistor)
+    │
+   GND
+```
+
+| Parameter | Value |
+|-----------|-------|
+| R1 (top) | 330kΩ |
+| R2 (bottom) | 100kΩ |
+| Divider ratio | 0.2326 |
+| Max ADC voltage | 2.93V (at 12.6V) |
+| Firmware formula | `V_battery = V_adc × 4.30` |
+
+---
+
+## Power System (Dual Mini560)
+
+```
+Solar Panel (30-50W, 18Vmp)
+    │
+    ▼
 CN3791 Charge Controller
-  │
-  ▼
-Li-Ion Battery (3.7V, 3000mAh)
-  │
-  ▼
-HT7333-A LDO (3.3V, 250mA, <5µA quiescent)
-  │
-  ├── ESP32 (always powered, deep sleep ~10µA)
-  ├── LoRa Module (sleep ~1µA)
-  └── MOSFET Gate (GPIO32) → Sensor bus (ON only during reading)
+    │
+    ▼
+3S Li-Ion Battery (11.1V nominal, 9.0–12.6V range)
+    │
+    ▼
+12V COMMON RAIL (reverse-polarity Schottky + 100µF bulk cap)
+    │
+    ├── Mini560 #1 (12V→5V fixed) ──► 5V BUS ──► E22-900T22D
+    │
+    ├── Mini560 #2 (12V→3.3V fixed) ──► 3.3V BUS ──► ESP32 + Sensors
+    │
+    └── MOSFET Switch (GPIO15 → IRF9540) ──► 12V_SW ──► Wind Sensors
 ```
 
-**Current Budget (per read cycle):**
+| Rail | Source | Voltage | Load |
+|------|--------|---------|------|
+| 12V_SW | 12V via MOSFET | 12V | RS485 anemometer + wind vane |
+| 5V BUS | Mini560 #1 | 5.0V fixed | E22-900T22D |
+| 3.3V BUS | Mini560 #2 | 3.3V fixed | ESP32-S3, BME280, LTR390, DS18B20, Soil |
 
-| Phase | Duration | Current | Energy |
-|-------|----------|---------|--------|
+---
+
+## Current Budget (per 2-minute read cycle)
+
+| Phase | Duration | Current @ 12V | Energy |
+|-------|----------|---------------|--------|
 | Wake + Init | 0.5s | 80 mA | 40 mAs |
-| Sensor read | 0.3s | 40 mA | 12 mAs |
-| LoRa TX | 1.0s | 120 mA | 120 mAs |
-| **Total active** | **1.8s** | | **172 mAs** |
-| Deep sleep | 118.2s | 16 µA | 1.9 mAs |
-| **Total per 2min cycle** | **120s** | | **~174 mAs** |
+| Sensor read (3.3V bus) | 0.3s | 40 mA | 12 mAs |
+| Wind sensors (12V_SW) | 1.0s | 50 mA | 50 mAs |
+| E22 LoRa TX (up to 22dBm) | 1.0s | Measure actual | TBD |
+| **Total active (5-min cycle)** | **2.8s** | — | **222 mAs** |
+| Deep sleep (296.2s) | 297.2s | 0.6 mA | 178 mAs |
+| **Total per 5-min cycle** | **300s** | — | **~400 mAs** |
 
-With 3000 mAh battery: ~7 days without charging, indefinite with solar.
+**Daily energy:** 288 cycles × 400 mAs = 115,200 mAs = **32 mAh @ 12V = 0.38 Wh**
+
+**Battery life (3S 3500mAh, no solar):** ~109 days  
+**With 30W solar (135 Wh/day in PH sun):** Indefinite / always full

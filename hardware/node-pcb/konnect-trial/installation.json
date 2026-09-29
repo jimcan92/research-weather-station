@@ -1,0 +1,44 @@
+{
+  "build": {
+    "commit": "fa62e1ccb9eba359519bf8e3eab53a6cffeee33c",
+    "commit_source": "build_environment",
+    "profile": "release",
+    "target_arch": "x86_64",
+    "target_os": "linux",
+    "version": "0.12.1",
+    "working_tree_state": "not_recorded"
+  },
+  "configuration": {
+    "search_policy": "first_existing_no_merge",
+    "selected_path": null,
+    "skipped_existing_paths": [],
+    "source": "defaults"
+  },
+  "installation": {
+    "binary_on_disk": {
+      "newer_than_running": false,
+      "probe_status": "ok",
+      "version": "0.12.1"
+    },
+    "evidence": "No verified KiCad PCM manifest was found beside this executable; standalone and source builds are intentionally not guessed from path names.",
+    "manifest_path": null,
+    "source": "unknown"
+  },
+  "ipc": {
+    "configured": false,
+    "endpoint": null,
+    "source": "resolved_server_config"
+  },
+  "kicad": {
+    "cli_path": null,
+    "probe_status": "not_found",
+    "version": null
+  },
+  "restart_guidance": [
+    "Linux: restart the MCP client that launched Konnect; if KiCad launched it, stop the plugin server or quit and reopen KiCad after the update.",
+    "Call get_installation_info again after restart and verify the serving version, commit, and executable path."
+  ],
+  "runtime": {
+    "executable_path": "/tmp/konnect-trial/konnect"
+  }
+}

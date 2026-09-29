@@ -7,7 +7,7 @@ ESP32 field sensors → LoRa 915 MHz → Raspberry Pi gateway → Ryzen 5 server
 ```
 ESP32 Nodes (solar + battery)
   │  Sensors: BME280, DS18B20, rain gauge, anemometer, wind vane, soil moisture
-  │  Radio:   SX1276/SX1278 LoRa @ 915 MHz (PH ISM band)
+  │  Radio:   E22-900T22D UART LoRa @ 915 MHz band
   │  Firmware: PlatformIO / Arduino framework
   │
   ▼ LoRa packets (JSON)
@@ -31,7 +31,7 @@ weather-station/
 │       ├── main.cpp         # Entry point, deep sleep loop
 │       ├── config.h         # Per-node config (pins, ID, calibration)
 │       ├── sensors.cpp      # Sensor reading (BME280, DS18B20, etc.)
-│       ├── lora.cpp         # LoRa radio wrapper (RadioLib)
+│       ├── lora.cpp         # E22 transparent-UART driver (M0/M1/AUX)
 │       └── packet.cpp       # Packet serialization (JSON/binary)
 ├── gateway/                 # RPi LoRa → MQTT bridge
 │   ├── lora_gateway.py      # Main gateway script

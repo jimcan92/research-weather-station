@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="680" viewBox="0 0 1120 680">
+<rect width="1120" height="680" fill="#f8fafc"/>
+<g font-family="sans-serif" fill="#172033">
+<text x="45" y="48" font-size="26" font-weight="bold">Weather station · automatic RS485 module</text>
+<text x="45" y="80" font-size="16">3.3V TTL supply · no DE/RE connection · GPIO16 unused</text>
+<rect x="40" y="112" width="1040" height="64" rx="8" fill="#fff0c2"/>
+<text x="58" y="138" font-size="16" font-weight="bold">PROVISIONAL UART MAPPING — verify TXD/RXD input/output directions before wiring.</text>
+<text x="58" y="161" font-size="15">The photo confirms terminal names, but not signal directions. Crossed UART wiring is assumed below.</text>
+<rect x="45" y="220" width="260" height="260" rx="12" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+<text x="67" y="253" font-size="22" font-weight="bold">ESP32-S3 / power</text>
+<rect x="470" y="220" width="270" height="260" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="492" y="253" font-size="22" font-weight="bold">DIYMORE RS485</text>
+<rect x="872" y="220" width="208" height="260" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="891" y="253" font-size="20" font-weight="bold">Wind sensors</text>
+<g font-size="17">
+<text x="65" y="295">3.3V BUS (AMS1117)</text><text x="487" y="295">VCC</text>
+<text x="65" y="340">GPIO18 / UART RX</text><text x="487" y="340">TXD (assumed output)</text>
+<text x="65" y="385">GPIO17 / UART TX</text><text x="487" y="385">RXD (assumed input)</text>
+<text x="65" y="430">Common GND</text><text x="487" y="430">GND (TTL side)</text>
+<text x="691" y="283">A+</text><text x="890" y="283">A bus</text>
+<text x="691" y="313">B−</text><text x="890" y="313">B bus</text>
+<text x="666" y="460">Earth</text><text x="888" y="382">V+ ← 12V_SW</text>
+<text x="888" y="410">GND ← common</text><text x="888" y="458">Both sensors</text>
+</g>
+<g fill="none" stroke-width="3"><path d="M305 290H470" stroke="#dc2626"/><path d="M305 335H470 M305 380H470" stroke="#0284c7" stroke-dasharray="7 4"/><path d="M305 425H470" stroke="#334155"/><path d="M740 278H872 M740 308H872" stroke="#7c3aed"/><path d="M740 455H784 M780 449l12 12 M780 461l12 -12" stroke="#64748b"/></g>
+<text x="790" y="448" font-size="13">NC</text>
+<text x="45" y="524" font-size="16">C7: 100nF across module VCC/GND. Old R8/R9 receive divider removed.</text>
+<text x="45" y="554" font-size="16">R10: 120Ω across A/B, DNP by default. Fit only at a bus end without existing termination.</text>
+<text x="45" y="584" font-size="16">Earth terminal remains separate from TTL GND; final grounding requires module documentation.</text>
+<text x="45" y="614" font-size="16">If labels use the host convention: GPIO17 → TXD input; GPIO18 ← RXD output.</text>
+<text x="45" y="650" font-size="13" fill="#64748b">Revision 2026-09-29 · Functional wiring reference; not a verified physical PCB footprint.</text>
+</g></svg>

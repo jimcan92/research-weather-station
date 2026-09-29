@@ -21,7 +21,7 @@ graph LR
 - **Framework:** Arduino via PlatformIO
 - **Power:** Solar panel + Li-Ion battery + charge controller
 - **Sleep:** ESP32 deep sleep (10 µA), wakes on timer, reads sensors, transmits, sleeps
-- **Radio:** SX1276/SX1278 LoRa module, 915 MHz, SF9, 125 kHz BW
+- **Radio:** E22-900T22D UART LoRa module, 915 MHz band, transparent mode at 9600 baud
 - **Sensors:** BME280 (T/H/P), DS18B20 (T), rain gauge, anemometer, wind vane, soil moisture
 
 ### Raspberry Pi Gateway
@@ -41,14 +41,18 @@ graph LR
 
 ## Radio Configuration
 
-| Parameter | Value | Reasoning |
-|-----------|-------|-----------|
-| Frequency | 915.0 MHz | Philippines ISM band (ITU Region 3) |
-| Bandwidth | 125 kHz | Standard LoRa BW, good balance |
-| Spreading Factor | 9 | ~2-5 km range, ~72 ms air time for 50B |
-| Coding Rate | 4/5 | Standard error correction |
-| TX Power | 17 dBm | Max legal for SX1276 |
-| Duty Cycle | ~1% | Self-imposed (PH has no strict limit) |
+The E22 stores channel, air data rate and TX power in its own nonvolatile registers.
+Configure both field-node and gateway radios identically before deployment. The ESP32
+firmware transports payloads over UART and does not change these air settings at runtime.
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| ESP32↔E22 UART | 9600 baud, 8N1 | Transparent serial transport |
+| Normal mode | M0=LOW, M1=LOW | Send/receive weather payloads |
+| Sleep mode | M0=HIGH, M1=HIGH | Entered before ESP32 deep sleep |
+| AUX | HIGH = ready | Firmware waits up to 3 seconds |
+| RF channel | Configure in E22 NVS | Must be in the 915 MHz band and match gateway |
+| Air data rate / TX power | Configure in E22 NVS | Must match the receiving E22 module |
 
 ## Packet Format
 

@@ -1,20 +1,28 @@
 import { json } from '@sveltejs/kit';
-import { db } from '$lib/server/db.js';
+import { getDB, markDBFailed } from '$lib/server/db.js';
 import { sensorReadings, sensorNodes } from '$lib/server/schema.js';
 import { sql, desc, count, avg, sum } from 'drizzle-orm';
+import { getMockReadings, getMockOverview } from '$lib/server/mock-data.js';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
   const page = Math.max(1, Number(url.searchParams.get('page')) || 1);
   const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 20));
-  const offset = (page - 1) * limit;
+
+  const db = getDB();
+  if (!db) {
+    console.log('API /readings: using mock data (DB unavailable)');
+    return page === 1
+      ? json({ ...getMockOverview(), page: 1, limit: 5, total: 500, readings: getMockOverview().latestReadings })
+      : json({ ...getMockReadings(page, limit), totalNodes: 0, activeNodes: 0, latestReadings: [], todayStats: { readings: 0, avgTemp: '—', totalRain: '—' } });
+  }
 
   try {
-    // Total count
+    const offset = (page - 1) * limit;
+
     const [{ cnt }] = await db.select({ cnt: count() }).from(sensorReadings);
     const total = Number(cnt);
 
-    // Paginated readings
     const readings = await db
       .select({
         id: sensorReadings.id,
@@ -37,7 +45,6 @@ export const GET: RequestHandler = async ({ url }) => {
       .limit(limit)
       .offset(offset);
 
-    // Overview stats (only for first page)
     let totalNodes = 0;
     let activeNodes = 0;
     let latestReadings: any[] = [];
@@ -70,7 +77,6 @@ export const GET: RequestHandler = async ({ url }) => {
         .orderBy(desc(sensorReadings.receivedAt))
         .limit(5);
 
-      // Today's stats
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
 
@@ -90,18 +96,27 @@ export const GET: RequestHandler = async ({ url }) => {
       };
     }
 
-    return json({
-      readings,
-      total,
-      page,
-      limit,
-      totalNodes,
-      activeNodes,
-      latestReadings,
-      todayStats,
-    });
+    return json({ readings, total, page, limit, totalNodes, activeNodes, latestReadings, todayStats });
   } catch (err: any) {
-    console.error('API /readings error:', err);
-    return json({ error: err.message }, { status: 500 });
+    // Connection refused or other DB error — mark failed, fall back to mock
+    console.error('API /readings DB error, falling back to mock:', err.message);
+    markDBFailed();
+
+    if (page === 1) {
+      const overview = getMockOverview();
+      return json({
+        readings: overview.latestReadings,
+        total: 500,
+        page: 1,
+        limit: 5,
+        totalNodes: overview.totalNodes,
+        activeNodes: overview.activeNodes,
+        latestReadings: overview.latestReadings,
+        todayStats: overview.todayStats,
+      });
+    }
+
+    const { readings, total } = getMockReadings(page, limit);
+    return json({ readings, total, page, limit, totalNodes: 0, activeNodes: 0, latestReadings: [], todayStats: { readings: 0, avgTemp: '—', totalRain: '—' } });
   }
 };

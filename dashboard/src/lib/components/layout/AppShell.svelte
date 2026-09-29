@@ -31,7 +31,7 @@
 
   <!-- Main content -->
   <div class="flex-1 flex flex-col lg:ml-64 min-h-screen">
-    <Topbar {onToggleSidebar} />
+    <Topbar onToggleSidebar={toggleSidebar} />
     <main class="flex-1 p-6 overflow-auto">
       {@render children()}
     </main>

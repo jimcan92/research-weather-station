@@ -2,15 +2,15 @@
   import { page } from '$app/stores';
   import { cn } from '$lib/utils.js';
   import { 
-    LayoutDashboard, MapPin, Table2, BarChart3, Settings,
-    CloudRain, Thermometer, Wind, Droplets, Sun
+    LayoutDashboard, Server, MapPin, Table2, BarChart3, Settings,
+    CloudRain, Thermometer, Wind, Droplets, Sun, Container
   } from '@lucide/svelte';
 
   interface NavItem {
     label: string;
     href: string;
     icon: typeof LayoutDashboard;
-    active?: boolean;
+    external?: boolean;
   }
 
   interface NavGroup {
@@ -20,23 +20,20 @@
 
   const navGroups: NavGroup[] = [
     {
-      label: 'Main',
+      label: 'Server',
       items: [
-        { label: 'Overview', href: '/', icon: LayoutDashboard },
-        { label: 'Sensor Nodes', href: '/nodes', icon: MapPin },
-        { label: 'Readings', href: '/readings', icon: Table2 },
-        { label: 'Charts', href: '/charts', icon: BarChart3 },
+        { label: 'Dashboard', href: '/', icon: LayoutDashboard },
+        { label: 'pgweb DB', href: 'http://localhost:8081', icon: Container, external: true },
       ]
     },
     {
-      label: 'Environment',
+      label: 'Weather Station',
       items: [
-        { label: 'Temperature', href: '/charts/temperature', icon: Thermometer },
-        { label: 'Rainfall', href: '/charts/rainfall', icon: CloudRain },
-        { label: 'Wind', href: '/charts/wind', icon: Wind },
-        { label: 'Humidity', href: '/charts/humidity', icon: Droplets },
+        { label: 'Grafana', href: 'http://localhost:3000/d/weather-station-main', icon: BarChart3, external: true },
+        { label: 'Sensor Nodes', href: '/nodes', icon: MapPin },
+        { label: 'Readings', href: '/readings', icon: Table2 },
       ]
-    }
+    },
   ];
 
   const adminGroup: NavGroup = {
@@ -59,11 +56,11 @@
   <div class="px-5 py-4 border-b border-sidebar-accent">
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-        <Sun class="w-5 h-5 text-white" />
+        <Server class="w-5 h-5 text-white" />
       </div>
       <div>
-        <h1 class="font-semibold text-sm">Weather Station</h1>
-        <p class="text-xs text-gray-400">Cantila Research</p>
+        <h1 class="font-semibold text-sm">coe-research</h1>
+        <p class="text-xs text-gray-400">Server Monitor</p>
       </div>
     </div>
   </div>
@@ -82,24 +79,37 @@
           {group.label}
         </p>
         {#each group.items as item}
-          <a
-            href={item.href}
-            class={cn(
-              'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
-              isActive(item.href)
-                ? 'bg-primary/10 text-primary font-medium'
-                : 'text-gray-300 hover:bg-sidebar-accent hover:text-white'
-            )}
-          >
-            <item.icon class="w-4 h-4" />
-            {item.label}
-          </a>
+          {#if item.external}
+            <a
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-gray-300 hover:bg-sidebar-accent hover:text-white"
+            >
+              <item.icon class="w-4 h-4" />
+              {item.label}
+              <span class="ml-auto text-gray-500 text-xs">↗</span>
+            </a>
+          {:else}
+            <a
+              href={item.href}
+              class={cn(
+                'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
+                isActive(item.href)
+                  ? 'bg-primary/10 text-primary font-medium'
+                  : 'text-gray-300 hover:bg-sidebar-accent hover:text-white'
+              )}
+            >
+              <item.icon class="w-4 h-4" />
+              {item.label}
+            </a>
+          {/if}
         {/each}
       </div>
     {/each}
   </nav>
 
-  <!-- Profile dropdown area -->
+  <!-- Profile -->
   <div class="border-t border-sidebar-accent p-3">
     <div class="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-sidebar-accent cursor-pointer transition-colors">
       <div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-xs font-bold text-primary">

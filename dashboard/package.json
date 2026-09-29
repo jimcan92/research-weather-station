@@ -29,6 +29,7 @@
 	},
 	"dependencies": {
 		"clsx": "^2.1.1",
+		"systeminformation": "^5.31.7",
 		"tailwind-merge": "^3.6.0"
 	}
 }

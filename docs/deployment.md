@@ -3,8 +3,9 @@
 ## Hardware Checklist
 
 ### Per ESP32 Node
-- [ ] ESP32-WROOM-32 or C3 dev board
-- [ ] SX1276/SX1278 LoRa module + 915 MHz antenna (SMA)
+- [ ] ESP32-S3 N16R8 dev board
+- [ ] E22-900T22D UART LoRa module + 900/915 MHz antenna (SMA)
+- [ ] 470µF/10V + 100nF capacitors at E22 VCC/GND
 - [ ] BME280 sensor module
 - [ ] DS18B20 waterproof probe (optional, secondary temp)
 - [ ] Rain gauge (tipping bucket)

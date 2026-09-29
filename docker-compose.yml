@@ -54,6 +54,16 @@ services:
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
       - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
 
+  # ── pgweb (Modern PostgreSQL Web Client) ──────────────────────────
+  pgweb:
+    image: sosedoff/pgweb:latest
+    container_name: ws-pgweb
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      PGWEB_DATABASE_URL: postgres://weather_ingestor:***@postgres:5432/weather_station?sslmode=disable
+
 volumes:
   pgdata:
   mosquitto_data:

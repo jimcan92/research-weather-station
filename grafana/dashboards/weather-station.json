@@ -1,0 +1,828 @@
+{
+  "dashboard": {
+    "editable": true,
+    "id": null,
+    "panels": [
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "noValue": "0",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 1
+                },
+                {
+                  "color": "green",
+                  "value": 3
+                }
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "id": 1,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "textMode": "auto"
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "table",
+            "rawSql": "SELECT COUNT(*) FROM sensor_nodes WHERE active = true",
+            "refId": "A"
+          }
+        ],
+        "title": "Active Nodes",
+        "type": "stat"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "noValue": "0",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 10
+                },
+                {
+                  "color": "green",
+                  "value": 100
+                }
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
+        "id": 2,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "textMode": "auto"
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "table",
+            "rawSql": "SELECT COUNT(*) FROM sensor_readings WHERE received_at >= NOW() - INTERVAL '24 hours'",
+            "refId": "A"
+          }
+        ],
+        "title": "Readings (24h)",
+        "type": "stat"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "noValue": "\u2014",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                },
+                {
+                  "color": "green",
+                  "value": 20
+                },
+                {
+                  "color": "orange",
+                  "value": 30
+                },
+                {
+                  "color": "red",
+                  "value": 35
+                }
+              ]
+            },
+            "unit": "celsius"
+          }
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "id": 3,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "textMode": "auto"
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "table",
+            "rawSql": "SELECT ROUND(AVG(temperature)::numeric, 1) FROM sensor_readings WHERE received_at >= NOW() - INTERVAL '24 hours' AND temperature IS NOT NULL",
+            "refId": "A"
+          }
+        ],
+        "title": "Avg Temperature (24h)",
+        "type": "stat"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "noValue": "0",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                },
+                {
+                  "color": "green",
+                  "value": 0.1
+                },
+                {
+                  "color": "orange",
+                  "value": 5
+                },
+                {
+                  "color": "red",
+                  "value": 20
+                }
+              ]
+            },
+            "unit": "mm"
+          }
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "id": 4,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "textMode": "auto"
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "table",
+            "rawSql": "SELECT COALESCE(ROUND(SUM(rain_mm)::numeric, 1), 0) FROM sensor_readings WHERE received_at >= NOW() - INTERVAL '24 hours'",
+            "refId": "A"
+          }
+        ],
+        "title": "Rain (24h)",
+        "type": "stat"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 5,
+              "lineWidth": 2,
+              "showPoints": "never",
+              "spanNulls": true
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "celsius"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 3
+        },
+        "id": 10,
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, temperature FROM sensor_readings WHERE node_id = 1 AND temperature IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node1"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, temperature FROM sensor_readings WHERE node_id = 2 AND temperature IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node2"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, temperature FROM sensor_readings WHERE node_id = 3 AND temperature IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node3"
+          }
+        ],
+        "title": "Temperature by Node",
+        "type": "timeseries"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 10,
+              "lineWidth": 2,
+              "showPoints": "never",
+              "spanNulls": true
+            },
+            "max": 100,
+            "min": 50,
+            "unit": "percent"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 3
+        },
+        "id": 11,
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, humidity FROM sensor_readings WHERE node_id = 1 AND humidity IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node1"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, humidity FROM sensor_readings WHERE node_id = 2 AND humidity IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node2"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, humidity FROM sensor_readings WHERE node_id = 3 AND humidity IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node3"
+          }
+        ],
+        "title": "Humidity by Node",
+        "type": "timeseries"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 5,
+              "lineWidth": 2,
+              "showPoints": "never",
+              "spanNulls": true
+            },
+            "unit": "pressurehpa"
+          }
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 0,
+          "y": 11
+        },
+        "id": 12,
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, pressure FROM sensor_readings WHERE node_id = 1 AND pressure IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node1"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, pressure FROM sensor_readings WHERE node_id = 2 AND pressure IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node2"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, pressure FROM sensor_readings WHERE node_id = 3 AND pressure IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node3"
+          }
+        ],
+        "title": "Atmospheric Pressure",
+        "type": "timeseries"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 5,
+              "lineWidth": 2,
+              "showPoints": "never",
+              "spanNulls": true
+            },
+            "unit": "velocityms"
+          }
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 12,
+          "y": 11
+        },
+        "id": 13,
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, wind_speed FROM sensor_readings WHERE node_id = 1 AND wind_speed IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node1"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, wind_speed FROM sensor_readings WHERE node_id = 2 AND wind_speed IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node2"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, wind_speed FROM sensor_readings WHERE node_id = 3 AND wind_speed IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node3"
+          }
+        ],
+        "title": "Wind Speed",
+        "type": "timeseries"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 0,
+              "lineWidth": 0,
+              "pointSize": 4,
+              "showPoints": "always"
+            },
+            "max": 360,
+            "min": 0,
+            "unit": "degree"
+          }
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 18,
+          "y": 11
+        },
+        "id": 14,
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, wind_dir FROM sensor_readings WHERE node_id = 1 AND wind_dir IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node1"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, wind_dir FROM sensor_readings WHERE node_id = 2 AND wind_dir IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node2"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, wind_dir FROM sensor_readings WHERE node_id = 3 AND wind_dir IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node3"
+          }
+        ],
+        "title": "Wind Direction",
+        "type": "timeseries"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 80
+            },
+            "unit": "mm"
+          }
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 0,
+          "y": 17
+        },
+        "id": 20,
+        "options": {
+          "orientation": "vertical"
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT DATE_TRUNC('hour', received_at) AS time, COALESCE(SUM(rain_mm), 0) AS rain FROM sensor_readings WHERE received_at >= NOW() - INTERVAL '24 hours' GROUP BY 1 ORDER BY 1",
+            "refId": "A"
+          }
+        ],
+        "title": "Rain per Hour",
+        "type": "barchart"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 5,
+              "lineWidth": 2,
+              "showPoints": "never",
+              "spanNulls": true
+            },
+            "max": 4.2,
+            "min": 3.2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 3.5
+                },
+                {
+                  "color": "green",
+                  "value": 3.7
+                }
+              ]
+            },
+            "unit": "volt"
+          }
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 12,
+          "y": 17
+        },
+        "id": 21,
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, battery_v FROM sensor_readings WHERE node_id = 1 AND battery_v IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node1"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, battery_v FROM sensor_readings WHERE node_id = 2 AND battery_v IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node2"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, battery_v FROM sensor_readings WHERE node_id = 3 AND battery_v IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node3"
+          }
+        ],
+        "title": "Battery Voltage",
+        "type": "timeseries"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 10,
+              "lineWidth": 2,
+              "showPoints": "never",
+              "spanNulls": true
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": -90
+                },
+                {
+                  "color": "green",
+                  "value": -70
+                }
+              ]
+            },
+            "unit": "dBm"
+          }
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 0,
+          "y": 23
+        },
+        "id": 30,
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, rssi FROM sensor_readings WHERE node_id = 1 AND rssi IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node1"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, rssi FROM sensor_readings WHERE node_id = 2 AND rssi IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node2"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, rssi FROM sensor_readings WHERE node_id = 3 AND rssi IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node3"
+          }
+        ],
+        "title": "LoRa RSSI",
+        "type": "timeseries"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "fillOpacity": 10,
+              "lineWidth": 2,
+              "showPoints": "never",
+              "spanNulls": true
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 0
+                },
+                {
+                  "color": "green",
+                  "value": 5
+                }
+              ]
+            },
+            "unit": "dB"
+          }
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 12,
+          "y": 23
+        },
+        "id": 31,
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, snr FROM sensor_readings WHERE node_id = 1 AND snr IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node1"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, snr FROM sensor_readings WHERE node_id = 2 AND snr IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node2"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "WeatherStation"
+            },
+            "format": "time_series",
+            "rawSql": "SELECT received_at AS time, snr FROM sensor_readings WHERE node_id = 3 AND snr IS NOT NULL AND received_at >= NOW() - INTERVAL '24 hours' ORDER BY received_at",
+            "refId": "node3"
+          }
+        ],
+        "title": "LoRa SNR",
+        "type": "timeseries"
+      }
+    ],
+    "refresh": "30s",
+    "schemaVersion": 39,
+    "tags": [
+      "weather",
+      "sensors",
+      "esp32"
+    ],
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "timezone": "browser",
+    "title": "Weather Station \u2014 Sensor Network",
+    "uid": "weather-station-main",
+    "version": 1
+  },
+  "overwrite": true
+}
