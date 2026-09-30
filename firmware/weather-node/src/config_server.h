@@ -1,9 +1,11 @@
 /**
- * config_server.h — WiFi Configuration Portal
+ * config_server.h — Embedded Web Server, REST API & mDNS Configuration
  *
- * Creates a WiFi access point (AP) at boot. Connect your phone to
- * "WeatherNode-1" WiFi, then open http://192.168.4.1 to edit settings.
- * Changes are saved to NVS and applied on reboot.
+ * Runs Dual-Mode WiFi:
+ *   - AP: "WeatherNode-1" (default IP: 192.168.4.1)
+ *   - STA: Connects to home/office WiFi router
+ *   - mDNS: http://weather.local (also accessible as http://weather.local on local network)
+ *   - DNS Server: Captive portal port 53 mapping any request to 192.168.4.1
  */
 
 #ifndef CONFIG_SERVER_H
@@ -12,11 +14,13 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
+#include <DNSServer.h>
 #include <Preferences.h>
+#include "packet.h"
 
-// AP settings
+// Network & Hostname settings
 #define CONFIG_AP_SSID    "WeatherNode-1"
-#define CONFIG_AP_TIMEOUT 300000   // 5 min — auto-close after this if no client
+#define CONFIG_MDNS_HOST  "weather"        // http://weather.local
 
 extern Preferences prefs;
 extern WebServer server;
@@ -24,36 +28,30 @@ extern bool configMode;
 
 // Runtime configuration (loaded from NVS)
 struct RuntimeConfig {
-  int  node_id;
-  int  sleep_interval_s;
+  int   node_id;
+  int   sleep_interval_s;
   float rain_tip_mm;
-  bool has_bme280, has_ltr390, has_rain_gauge;
-  bool has_anemometer, has_wind_vane, has_soil_moist;
-  int  modbus_anemometer, modbus_wind_vane;
+  bool  has_bme280, has_ltr390, has_rain_gauge;
+  bool  has_anemometer, has_wind_vane, has_soil_moist;
+  int   modbus_anemometer, modbus_wind_vane;
+  char  sta_ssid[33];
+  char  sta_pass[65];
 };
 extern RuntimeConfig rtConfig;
 
-/**
- * Start the configuration portal (WiFi AP + web server).
- * Blocks for up to CONFIG_AP_TIMEOUT ms or until user clicks "Save & Reboot".
- */
+/** Start LittleFS, Dual WiFi (AP+STA), mDNS, DNS Server, and Core 0 Web Server Task */
 void configPortalStart();
 
-/**
- * Handle web client requests (call in loop).
- * Returns true if portal is still active.
- */
+/** Handle incoming HTTP requests in loop() if not using FreeRTOS task */
 bool configPortalLoop();
 
-/**
- * Load saved configuration from NVS into the global config variables.
- * Call at boot, before using any config values.
- */
+/** Update cached telemetry from sensor readings */
+void updateTelemetryCache(const SensorData& data, float batV, uint32_t batRawMv, uint32_t soilRawMv);
+
+/** Load saved configuration from NVS */
 void configLoad();
 
-/**
- * Save current config to NVS.
- */
+/** Save current config to NVS */
 void configSave();
 
-#endif
+#endif // CONFIG_SERVER_H
